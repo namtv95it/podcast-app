@@ -79,6 +79,7 @@ function playTrack(trackId) {
     
     // Cập nhật UI
     playerTitle.textContent = track.title;
+    document.title = `${track.title} - Phàm Nhân Tu Tiên`;
     updateListUI();
     
     // Hiển thị thanh player nếu nó đang bị ẩn (trượt lên)
@@ -267,6 +268,7 @@ function restoreSession() {
         if (track) {
             currentTrackId = lastTrackId;
             playerTitle.textContent = track.title;
+            document.title = `${track.title} - Phàm Nhân Tu Tiên`;
             updateListUI();
             
             // Cuộn đến tập đang phát
