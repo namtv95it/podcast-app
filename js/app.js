@@ -10,6 +10,7 @@ const LAST_PLAYED_KEY = 'podcast_last_played_track';
 const VOLUME_KEY = 'podcast_volume';
 const MUTED_KEY = 'podcast_muted';
 const THEME_KEY = 'podcast_theme';
+const SPEED_KEY = 'podcast_playback_speed';
 
 // Hàm render danh sách
 function renderAudioList() {
@@ -96,6 +97,12 @@ function playTrack(trackId) {
         // Chỉ chạy 1 lần khi load source mới
         globalAudio.removeEventListener('loadedmetadata', onLoaded);
         
+        // Cập nhật lại tốc độ phát vì trình duyệt có thể reset khi đổi source
+        const savedSpeed = localStorage.getItem(SPEED_KEY);
+        if (savedSpeed !== null) {
+            globalAudio.playbackRate = parseFloat(savedSpeed);
+        }
+        
         const storageKey = `history_${trackId}`;
         const savedTime = localStorage.getItem(storageKey);
         
@@ -141,6 +148,22 @@ function setupGlobalPlayer() {
     const iconVolUp = document.getElementById('icon-vol-up');
     const iconVolMute = document.getElementById('icon-vol-mute');
     const volumeBar = document.getElementById('volume-bar');
+    const playbackSpeed = document.getElementById('playback-speed');
+
+    // Xử lý Tốc độ phát
+    if (playbackSpeed) {
+        const savedSpeed = localStorage.getItem(SPEED_KEY);
+        if (savedSpeed !== null) {
+            globalAudio.playbackRate = parseFloat(savedSpeed);
+            playbackSpeed.value = savedSpeed;
+        }
+
+        playbackSpeed.addEventListener('change', (e) => {
+            const speed = parseFloat(e.target.value);
+            globalAudio.playbackRate = speed;
+            localStorage.setItem(SPEED_KEY, speed.toString());
+        });
+    }
 
     if (btnRewind10) {
         btnRewind10.addEventListener('click', () => {
@@ -410,6 +433,12 @@ function restoreSession() {
             // Xử lý tua thời gian khi load metadata
             globalAudio.addEventListener('loadedmetadata', function onLoaded() {
                 globalAudio.removeEventListener('loadedmetadata', onLoaded);
+                
+                // Cập nhật lại tốc độ phát
+                const savedSpeed = localStorage.getItem(SPEED_KEY);
+                if (savedSpeed !== null) {
+                    globalAudio.playbackRate = parseFloat(savedSpeed);
+                }
                 
                 const storageKey = `history_${lastTrackId}`;
                 const savedTime = localStorage.getItem(storageKey);
