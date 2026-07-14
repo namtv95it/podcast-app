@@ -9,6 +9,7 @@ let currentTrackId = null;
 const LAST_PLAYED_KEY = 'podcast_last_played_track';
 const VOLUME_KEY = 'podcast_volume';
 const MUTED_KEY = 'podcast_muted';
+const THEME_KEY = 'podcast_theme';
 
 // Hàm render danh sách
 function renderAudioList() {
@@ -18,19 +19,19 @@ function renderAudioList() {
         const card = document.createElement('div');
         // Gắn id cho card để dễ update style (active)
         card.id = `card-${item.id}`;
-        card.className = 'audio-card bg-gray-50 border border-gray-300 rounded-xl p-4 flex items-center justify-between group';
+        card.className = 'audio-card bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-xl p-4 flex items-center justify-between group transition-colors';
         
         const titleContainer = document.createElement('div');
         titleContainer.className = 'flex items-center gap-3';
         
         const icon = document.createElement('div');
-        icon.className = 'w-10 h-10 rounded-full bg-blue-100 text-blue-500 flex items-center justify-center flex-shrink-0 group-hover:bg-blue-500 group-hover:text-white transition-colors';
+        icon.className = 'w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-500 dark:text-blue-400 flex items-center justify-center flex-shrink-0 group-hover:bg-blue-500 dark:group-hover:bg-blue-500 group-hover:text-white transition-colors';
         icon.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
             <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd" />
         </svg>`;
 
         const title = document.createElement('h2');
-        title.className = 'text-base font-semibold text-gray-700';
+        title.className = 'text-base font-semibold text-gray-700 dark:text-gray-200 transition-colors';
         title.textContent = item.title;
 
         titleContainer.appendChild(icon);
@@ -399,8 +400,47 @@ function restoreSession() {
     }
 }
 
+// Setup Theme (Dark/Light mode)
+function setupTheme() {
+    const themeToggleBtn = document.getElementById('theme-toggle');
+    const darkIcon = document.getElementById('theme-toggle-dark-icon');
+    const lightIcon = document.getElementById('theme-toggle-light-icon');
+
+    if (!themeToggleBtn) return;
+
+    // Khởi tạo
+    const savedTheme = localStorage.getItem(THEME_KEY);
+    // Mặc định là sáng nếu chưa có
+    if (savedTheme === 'dark') {
+        document.documentElement.classList.add('dark');
+        lightIcon.classList.remove('hidden'); // Đang ở Dark -> Hiện icon mặt trời
+        darkIcon.classList.add('hidden');
+    } else {
+        document.documentElement.classList.remove('dark');
+        darkIcon.classList.remove('hidden'); // Đang ở Light -> Hiện icon mặt trăng
+        lightIcon.classList.add('hidden');
+    }
+
+    // Lắng nghe click
+    themeToggleBtn.addEventListener('click', () => {
+        document.documentElement.classList.toggle('dark');
+        const isDark = document.documentElement.classList.contains('dark');
+        
+        if (isDark) {
+            localStorage.setItem(THEME_KEY, 'dark');
+            lightIcon.classList.remove('hidden');
+            darkIcon.classList.add('hidden');
+        } else {
+            localStorage.setItem(THEME_KEY, 'light');
+            darkIcon.classList.remove('hidden');
+            lightIcon.classList.add('hidden');
+        }
+    });
+}
+
 // Khởi chạy ứng dụng
 document.addEventListener('DOMContentLoaded', () => {
+    setupTheme();
     renderAudioList();
     setupGlobalPlayer();
     restoreSession();
