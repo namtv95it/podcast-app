@@ -317,6 +317,7 @@ function setupGlobalPlayer() {
         });
     }
 
+    let lastSaveTime = 0;
     globalAudio.addEventListener('timeupdate', () => {
         if (!currentTrackId) return;
         
@@ -329,7 +330,12 @@ function setupGlobalPlayer() {
 
         const storageKey = `history_${currentTrackId}`;
         if(globalAudio.currentTime > 0 && globalAudio.currentTime < globalAudio.duration) {
-            localStorage.setItem(storageKey, globalAudio.currentTime);
+            const now = Date.now();
+            // Lưu trạng thái 5 giây 1 lần thay vì lưu liên tục
+            if (now - lastSaveTime >= 5000) {
+                localStorage.setItem(storageKey, globalAudio.currentTime);
+                lastSaveTime = now;
+            }
         }
     });
 
