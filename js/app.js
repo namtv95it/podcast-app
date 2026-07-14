@@ -230,6 +230,23 @@ function setupGlobalPlayer() {
         if(progressBar) progressBar.value = 0;
         if(timeCurrent) timeCurrent.textContent = "00:00";
     });
+
+    // Bắt sự kiện phím Space (cách) để Play/Pause
+    document.addEventListener('keydown', (e) => {
+        // Bỏ qua nếu người dùng đang gõ phím vào ô input/textarea (phòng ngừa)
+        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+
+        if (e.code === 'Space') {
+            e.preventDefault(); // Ngăn trình duyệt cuộn trang
+            if (!currentTrackId) return;
+            
+            if (globalAudio.paused) {
+                globalAudio.play();
+            } else {
+                globalAudio.pause();
+            }
+        }
+    });
 }
 
 // Khôi phục phiên làm việc trước đó
