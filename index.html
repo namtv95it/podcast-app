@@ -106,12 +106,19 @@
                 </div>
                 
                 <!-- Hàng 2: Các nút điều khiển trung tâm -->
-                <div class="flex items-center justify-between gap-2 sm:gap-3 w-full">
+                <div class="flex items-center justify-between gap-1 sm:gap-2 w-full">
+                    <!-- Nút Tập trước -->
+                    <button id="btn-prev-track" class="flex-1 flex items-center justify-center h-10 bg-gray-100 dark:bg-gray-800 hover:bg-blue-100 dark:hover:bg-blue-900/50 hover:text-blue-600 dark:hover:text-blue-400 text-gray-600 dark:text-gray-300 rounded-full transition-colors shadow-sm" title="Tập trước">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 sm:h-5 sm:w-5" viewBox="0 0 20 20" fill="currentColor">
+                          <path d="M8.445 14.832A1 1 0 0010 14v-2.798l5.445 3.63A1 1 0 0017 14V6a1 1 0 00-1.555-.832L10 8.798V6a1 1 0 00-1.555-.832l-6 4a1 1 0 000 1.664l6 4z" />
+                        </svg>
+                    </button>
+
                     <!-- Nút Rewind 30s -->
-                    <button id="btn-rewind-30" class="flex-1 flex items-center justify-center h-10 bg-gray-100 dark:bg-gray-800 hover:bg-blue-100 dark:hover:bg-blue-900/50 hover:text-blue-600 dark:hover:text-blue-400 text-gray-600 dark:text-gray-300 rounded-full transition-colors shadow-sm text-xs font-bold" title="Tua lại 30s">-30s</button>
+                    <button id="btn-rewind-30" class="flex-1 flex items-center justify-center h-10 bg-gray-100 dark:bg-gray-800 hover:bg-blue-100 dark:hover:bg-blue-900/50 hover:text-blue-600 dark:hover:text-blue-400 text-gray-600 dark:text-gray-300 rounded-full transition-colors shadow-sm text-[10px] sm:text-xs font-bold" title="Tua lại 30s">-30s</button>
 
                     <!-- Nút Rewind 10s -->
-                    <button id="btn-rewind-10" class="flex-1 flex items-center justify-center h-10 bg-gray-100 dark:bg-gray-800 hover:bg-blue-100 dark:hover:bg-blue-900/50 hover:text-blue-600 dark:hover:text-blue-400 text-gray-600 dark:text-gray-300 rounded-full transition-colors shadow-sm text-xs font-bold" title="Tua lại 10s">-10s</button>
+                    <button id="btn-rewind-10" class="flex-1 flex items-center justify-center h-10 bg-gray-100 dark:bg-gray-800 hover:bg-blue-100 dark:hover:bg-blue-900/50 hover:text-blue-600 dark:hover:text-blue-400 text-gray-600 dark:text-gray-300 rounded-full transition-colors shadow-sm text-[10px] sm:text-xs font-bold" title="Tua lại 10s">-10s</button>
                     
                     <!-- Nút Play/Pause -->
                     <button id="btn-play-pause" class="flex items-center justify-center w-14 h-14 bg-blue-500 text-white hover:bg-blue-600 rounded-full transition-colors shadow-md flex-shrink-0" title="Phát/Tạm dừng">
@@ -124,10 +131,17 @@
                     </button>
                     
                     <!-- Nút Forward 10s -->
-                    <button id="btn-forward-10" class="flex-1 flex items-center justify-center h-10 bg-gray-100 dark:bg-gray-800 hover:bg-blue-100 dark:hover:bg-blue-900/50 hover:text-blue-600 dark:hover:text-blue-400 text-gray-600 dark:text-gray-300 rounded-full transition-colors shadow-sm text-xs font-bold" title="Tua đi 10s">+10s</button>
+                    <button id="btn-forward-10" class="flex-1 flex items-center justify-center h-10 bg-gray-100 dark:bg-gray-800 hover:bg-blue-100 dark:hover:bg-blue-900/50 hover:text-blue-600 dark:hover:text-blue-400 text-gray-600 dark:text-gray-300 rounded-full transition-colors shadow-sm text-[10px] sm:text-xs font-bold" title="Tua đi 10s">+10s</button>
 
                     <!-- Nút Forward 30s -->
-                    <button id="btn-forward-30" class="flex-1 flex items-center justify-center h-10 bg-gray-100 dark:bg-gray-800 hover:bg-blue-100 dark:hover:bg-blue-900/50 hover:text-blue-600 dark:hover:text-blue-400 text-gray-600 dark:text-gray-300 rounded-full transition-colors shadow-sm text-xs font-bold" title="Tua đi 30s">+30s</button>
+                    <button id="btn-forward-30" class="flex-1 flex items-center justify-center h-10 bg-gray-100 dark:bg-gray-800 hover:bg-blue-100 dark:hover:bg-blue-900/50 hover:text-blue-600 dark:hover:text-blue-400 text-gray-600 dark:text-gray-300 rounded-full transition-colors shadow-sm text-[10px] sm:text-xs font-bold" title="Tua đi 30s">+30s</button>
+
+                    <!-- Nút Tập sau -->
+                    <button id="btn-next-track" class="flex-1 flex items-center justify-center h-10 bg-gray-100 dark:bg-gray-800 hover:bg-blue-100 dark:hover:bg-blue-900/50 hover:text-blue-600 dark:hover:text-blue-400 text-gray-600 dark:text-gray-300 rounded-full transition-colors shadow-sm" title="Tập sau">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 sm:h-5 sm:w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path d="M4.555 5.168A1 1 0 003 6v8a1 1 0 001.555.832L10 11.202v2.798a1 1 0 001.555.832l6-4a1 1 0 000-1.664l-6-4A1 1 0 0010 6v2.798L4.555 5.168z" />
+                        </svg>
+                    </button>
                 </div>
                 
                 <!-- Thẻ audio ẩn -->

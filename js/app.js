@@ -125,6 +125,8 @@ function formatTime(seconds) {
 
 // Setup các sự kiện cho Global Player
 function setupGlobalPlayer() {
+    const btnPrevTrack = document.getElementById('btn-prev-track');
+    const btnNextTrack = document.getElementById('btn-next-track');
     const btnRewind10 = document.getElementById('btn-rewind-10');
     const btnForward10 = document.getElementById('btn-forward-10');
     const btnRewind30 = document.getElementById('btn-rewind-30');
@@ -179,6 +181,28 @@ function setupGlobalPlayer() {
                 globalAudio.play();
             } else {
                 globalAudio.pause();
+            }
+        });
+    }
+
+    if (btnPrevTrack) {
+        btnPrevTrack.addEventListener('click', () => {
+            if (!currentTrackId) return;
+            const currentIndex = audioData.findIndex(t => t.id === currentTrackId);
+            if (currentIndex > 0) {
+                const prevTrack = audioData[currentIndex - 1];
+                playTrack(prevTrack.id);
+            }
+        });
+    }
+
+    if (btnNextTrack) {
+        btnNextTrack.addEventListener('click', () => {
+            if (!currentTrackId) return;
+            const currentIndex = audioData.findIndex(t => t.id === currentTrackId);
+            if (currentIndex !== -1 && currentIndex < audioData.length - 1) {
+                const nextTrack = audioData[currentIndex + 1];
+                playTrack(nextTrack.id);
             }
         });
     }
