@@ -7,6 +7,7 @@ const playerTitle = document.getElementById('player-title');
 // Trạng thái hiện tại
 let currentTrackId = null;
 const LAST_PLAYED_KEY = 'podcast_last_played_track';
+const VOLUME_KEY = 'podcast_volume';
 
 // Hàm render danh sách
 function renderAudioList() {
@@ -132,6 +133,10 @@ function setupGlobalPlayer() {
     const progressBar = document.getElementById('progress-bar');
     const timeCurrent = document.getElementById('time-current');
     const timeDuration = document.getElementById('time-duration');
+    const btnMute = document.getElementById('btn-mute');
+    const iconVolUp = document.getElementById('icon-vol-up');
+    const iconVolMute = document.getElementById('icon-vol-mute');
+    const volumeBar = document.getElementById('volume-bar');
 
     if (btnRewind10) {
         btnRewind10.addEventListener('click', () => {
@@ -172,6 +177,65 @@ function setupGlobalPlayer() {
                 globalAudio.play();
             } else {
                 globalAudio.pause();
+            }
+        });
+    }
+
+    // Xử lý Volume
+    if (volumeBar) {
+        // Khôi phục volume từ Local Storage nếu có
+        const savedVolume = localStorage.getItem(VOLUME_KEY);
+        if (savedVolume !== null) {
+            volumeBar.value = savedVolume;
+            globalAudio.volume = savedVolume;
+            if (savedVolume == 0) {
+                globalAudio.muted = true;
+                if (iconVolUp && iconVolMute) {
+                    iconVolUp.classList.add('hidden');
+                    iconVolMute.classList.remove('hidden');
+                }
+            }
+        } else {
+            globalAudio.volume = volumeBar.value; // Khởi tạo mặc định
+        }
+
+        volumeBar.addEventListener('input', (e) => {
+            const vol = e.target.value;
+            globalAudio.volume = vol;
+            globalAudio.muted = false;
+            localStorage.setItem(VOLUME_KEY, vol); // Lưu vào Local Storage
+            
+            if (iconVolUp && iconVolMute) {
+                if (vol == 0) {
+                    globalAudio.muted = true;
+                    iconVolUp.classList.add('hidden');
+                    iconVolMute.classList.remove('hidden');
+                } else {
+                    iconVolUp.classList.remove('hidden');
+                    iconVolMute.classList.add('hidden');
+                }
+            }
+        });
+    }
+
+    if (btnMute) {
+        btnMute.addEventListener('click', () => {
+            globalAudio.muted = !globalAudio.muted;
+            if (iconVolUp && iconVolMute) {
+                if (globalAudio.muted) {
+                    iconVolUp.classList.add('hidden');
+                    iconVolMute.classList.remove('hidden');
+                    if (volumeBar) {
+                        volumeBar.value = 0;
+                    }
+                    localStorage.setItem(VOLUME_KEY, 0);
+                } else {
+                    iconVolUp.classList.remove('hidden');
+                    iconVolMute.classList.add('hidden');
+                    if (globalAudio.volume == 0) globalAudio.volume = 1;
+                    if (volumeBar) volumeBar.value = globalAudio.volume;
+                    localStorage.setItem(VOLUME_KEY, globalAudio.volume);
+                }
             }
         });
     }
@@ -242,7 +306,7 @@ function setupGlobalPlayer() {
         }
     });
 
-    // Bắt sự kiện phím Space (cách) để Play/Pause
+    // Bắt sự kiện bàn phím (Space, ArrowLeft, ArrowRight)
     document.addEventListener('keydown', (e) => {
         // Bỏ qua nếu người dùng đang gõ phím vào ô input/textarea (phòng ngừa)
         if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
@@ -256,6 +320,12 @@ function setupGlobalPlayer() {
             } else {
                 globalAudio.pause();
             }
+        } else if (e.code === 'ArrowLeft') {
+            if (!currentTrackId) return;
+            globalAudio.currentTime = Math.max(0, globalAudio.currentTime - 10);
+        } else if (e.code === 'ArrowRight') {
+            if (!currentTrackId) return;
+            globalAudio.currentTime = Math.min(globalAudio.duration || 0, globalAudio.currentTime + 10);
         }
     });
 }
