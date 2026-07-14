@@ -8,6 +8,7 @@ const playerTitle = document.getElementById('player-title');
 let currentTrackId = null;
 const LAST_PLAYED_KEY = 'podcast_last_played_track';
 const VOLUME_KEY = 'podcast_volume';
+const MUTED_KEY = 'podcast_muted';
 
 // Hàm render danh sách
 function renderAudioList() {
@@ -183,36 +184,55 @@ function setupGlobalPlayer() {
 
     // Xử lý Volume
     if (volumeBar) {
-        // Khôi phục volume từ Local Storage nếu có
+        // Khôi phục volume và trạng thái mute từ Local Storage
         const savedVolume = localStorage.getItem(VOLUME_KEY);
+        const savedMuted = localStorage.getItem(MUTED_KEY);
+
         if (savedVolume !== null) {
-            volumeBar.value = savedVolume;
             globalAudio.volume = savedVolume;
-            if (savedVolume == 0) {
-                globalAudio.muted = true;
-                if (iconVolUp && iconVolMute) {
-                    iconVolUp.classList.add('hidden');
-                    iconVolMute.classList.remove('hidden');
-                }
+            volumeBar.value = savedVolume;
+        } else {
+            globalAudio.volume = 1;
+            volumeBar.value = 1;
+        }
+
+        if (savedMuted === 'true') {
+            globalAudio.muted = true;
+            if (iconVolUp && iconVolMute) {
+                iconVolUp.classList.add('hidden');
+                iconVolMute.classList.remove('hidden');
             }
         } else {
-            globalAudio.volume = volumeBar.value; // Khởi tạo mặc định
+            globalAudio.muted = false;
+        }
+
+        // Nếu volume = 0 mà không bị mute thì vẫn hiển thị icon mute
+        if (globalAudio.volume == 0 && !globalAudio.muted) {
+            if (iconVolUp && iconVolMute) {
+                iconVolUp.classList.add('hidden');
+                iconVolMute.classList.remove('hidden');
+            }
         }
 
         volumeBar.addEventListener('input', (e) => {
             const vol = e.target.value;
             globalAudio.volume = vol;
-            globalAudio.muted = false;
-            localStorage.setItem(VOLUME_KEY, vol); // Lưu vào Local Storage
-            
-            if (iconVolUp && iconVolMute) {
-                if (vol == 0) {
-                    globalAudio.muted = true;
-                    iconVolUp.classList.add('hidden');
-                    iconVolMute.classList.remove('hidden');
-                } else {
+            localStorage.setItem(VOLUME_KEY, vol);
+
+            // Tự động bỏ mute nếu kéo volume > 0, hoặc ép mute nếu kéo về 0
+            if (vol > 0) {
+                globalAudio.muted = false;
+                localStorage.setItem(MUTED_KEY, 'false');
+                if (iconVolUp && iconVolMute) {
                     iconVolUp.classList.remove('hidden');
                     iconVolMute.classList.add('hidden');
+                }
+            } else {
+                globalAudio.muted = true;
+                localStorage.setItem(MUTED_KEY, 'true');
+                if (iconVolUp && iconVolMute) {
+                    iconVolUp.classList.add('hidden');
+                    iconVolMute.classList.remove('hidden');
                 }
             }
         });
@@ -221,20 +241,23 @@ function setupGlobalPlayer() {
     if (btnMute) {
         btnMute.addEventListener('click', () => {
             globalAudio.muted = !globalAudio.muted;
+            localStorage.setItem(MUTED_KEY, globalAudio.muted.toString());
+            
             if (iconVolUp && iconVolMute) {
                 if (globalAudio.muted) {
                     iconVolUp.classList.add('hidden');
                     iconVolMute.classList.remove('hidden');
-                    if (volumeBar) {
-                        volumeBar.value = 0;
-                    }
-                    localStorage.setItem(VOLUME_KEY, 0);
+                    // Không đổi value của thanh volumeBar để giữ lại mức âm lượng trước khi tắt
                 } else {
                     iconVolUp.classList.remove('hidden');
                     iconVolMute.classList.add('hidden');
-                    if (globalAudio.volume == 0) globalAudio.volume = 1;
-                    if (volumeBar) volumeBar.value = globalAudio.volume;
-                    localStorage.setItem(VOLUME_KEY, globalAudio.volume);
+                    
+                    // Nếu unmute mà mức volume vẫn đang là 0, thì ép lên mức 1 để có tiếng
+                    if (globalAudio.volume == 0) {
+                        globalAudio.volume = 1;
+                        if (volumeBar) volumeBar.value = 1;
+                        localStorage.setItem(VOLUME_KEY, 1);
+                    }
                 }
             }
         });
