@@ -41,7 +41,6 @@
     <div class="max-w-2xl w-full bg-white rounded-2xl shadow-lg p-6 sm:p-8 mb-8">
         <div class="text-center mb-8">
             <h1 class="text-3xl font-bold text-gray-800 mb-2">Phàm nhân tu tiên</h1>
-            <p class="text-gray-500">Nghe lại bất cứ lúc nào, tiến trình của bạn luôn được lưu giữ.</p>
         </div>
         
         <!-- Vùng chứa danh sách -->
@@ -68,8 +67,12 @@
             </div>
 
             <!-- Thẻ Audio Control -->
-            <div class="flex-1 w-full sm:w-auto flex justify-end">
+            <div class="flex-1 w-full sm:w-auto flex items-center justify-end gap-2">
+                <button id="btn-rewind" class="flex items-center justify-center w-10 h-10 bg-gray-100 hover:bg-blue-100 hover:text-blue-600 text-gray-600 rounded-full transition-colors flex-shrink-0 font-bold text-xs" title="Tua lại 10s">-10s</button>
+                
                 <audio id="global-audio" class="w-full sm:w-96 outline-none" controls preload="metadata"></audio>
+                
+                <button id="btn-forward" class="flex items-center justify-center w-10 h-10 bg-gray-100 hover:bg-blue-100 hover:text-blue-600 text-gray-600 rounded-full transition-colors flex-shrink-0 font-bold text-xs" title="Tua đi 10s">+10s</button>
             </div>
             
         </div>

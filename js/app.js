@@ -110,6 +110,25 @@ function playTrack(trackId) {
 
 // Setup các sự kiện cho Global Player
 function setupGlobalPlayer() {
+    const btnRewind = document.getElementById('btn-rewind');
+    const btnForward = document.getElementById('btn-forward');
+
+    if (btnRewind) {
+        btnRewind.addEventListener('click', () => {
+            if (globalAudio.currentTime) {
+                globalAudio.currentTime = Math.max(0, globalAudio.currentTime - 10);
+            }
+        });
+    }
+
+    if (btnForward) {
+        btnForward.addEventListener('click', () => {
+            if (globalAudio.currentTime || globalAudio.currentTime === 0) {
+                globalAudio.currentTime = Math.min(globalAudio.duration || 0, globalAudio.currentTime + 10);
+            }
+        });
+    }
+
     globalAudio.addEventListener('timeupdate', () => {
         if (!currentTrackId) return;
         const storageKey = `history_${currentTrackId}`;
