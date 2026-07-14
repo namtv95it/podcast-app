@@ -16,7 +16,7 @@ function renderAudioList() {
         const card = document.createElement('div');
         // Gắn id cho card để dễ update style (active)
         card.id = `card-${item.id}`;
-        card.className = 'audio-card bg-gray-50 border border-gray-100 rounded-xl p-4 flex items-center justify-between group';
+        card.className = 'audio-card bg-gray-50 border border-gray-300 rounded-xl p-4 flex items-center justify-between group';
         
         const titleContainer = document.createElement('div');
         titleContainer.className = 'flex items-center gap-3';
