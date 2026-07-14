@@ -98,10 +98,13 @@ function playTrack(trackId) {
         if (savedTime !== null && !isNaN(savedTime)) {
             const timeToSeek = parseFloat(savedTime);
             if (timeToSeek > 0 && timeToSeek < globalAudio.duration) {
-                globalAudio.currentTime = timeToSeek;
+                // Bỏ qua 30s đầu (quảng cáo)
+                globalAudio.currentTime = Math.max(30, timeToSeek);
+            } else {
+                globalAudio.currentTime = 30;
             }
         } else {
-            globalAudio.currentTime = 0;
+            globalAudio.currentTime = 30; // Bỏ qua 30s đầu
         }
         
         globalAudio.play().catch(e => console.log("Auto-play prevented by browser: ", e));
@@ -229,6 +232,13 @@ function setupGlobalPlayer() {
         }
         if(progressBar) progressBar.value = 0;
         if(timeCurrent) timeCurrent.textContent = "00:00";
+
+        // Tự động chuyển sang bài tiếp theo
+        const currentIndex = audioData.findIndex(t => t.id === currentTrackId);
+        if (currentIndex !== -1 && currentIndex < audioData.length - 1) {
+            const nextTrack = audioData[currentIndex + 1];
+            playTrack(nextTrack.id);
+        }
     });
 
     // Bắt sự kiện phím Space (cách) để Play/Pause
@@ -281,8 +291,12 @@ function restoreSession() {
                 if (savedTime !== null && !isNaN(savedTime)) {
                     const timeToSeek = parseFloat(savedTime);
                     if (timeToSeek > 0 && timeToSeek < globalAudio.duration) {
-                        globalAudio.currentTime = timeToSeek;
+                        globalAudio.currentTime = Math.max(30, timeToSeek); // Bỏ qua 30s đầu
+                    } else {
+                        globalAudio.currentTime = 30;
                     }
+                } else {
+                    globalAudio.currentTime = 30;
                 }
                 // Lưu ý: Không tự động phát (play) ở đây vì trình duyệt chặn tự phát khi vừa tải trang
             });
