@@ -86,6 +86,14 @@ function playTrack(trackId) {
     document.title = `${track.title} - Phàm Nhân Tu Tiên`;
     updateListUI();
     
+    // Cuộn danh sách đến tập đang phát
+    const activeCard = document.getElementById(`card-${trackId}`);
+    if (activeCard) {
+        setTimeout(() => {
+            activeCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }, 100);
+    }
+    
     // Hiển thị thanh player nếu nó đang bị ẩn (trượt lên)
     globalPlayerContainer.classList.remove('translate-y-full');
 
