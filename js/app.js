@@ -108,31 +108,110 @@ function playTrack(trackId) {
     });
 }
 
+// Hàm format thời gian (giây) sang dạng MM:SS
+function formatTime(seconds) {
+    if (isNaN(seconds)) return "00:00";
+    const m = Math.floor(seconds / 60);
+    const s = Math.floor(seconds % 60);
+    return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+}
+
 // Setup các sự kiện cho Global Player
 function setupGlobalPlayer() {
-    const btnRewind = document.getElementById('btn-rewind');
-    const btnForward = document.getElementById('btn-forward');
+    const btnRewind10 = document.getElementById('btn-rewind-10');
+    const btnForward10 = document.getElementById('btn-forward-10');
+    const btnRewind30 = document.getElementById('btn-rewind-30');
+    const btnForward30 = document.getElementById('btn-forward-30');
+    const btnPlayPause = document.getElementById('btn-play-pause');
+    const iconPlay = document.getElementById('icon-play');
+    const iconPause = document.getElementById('icon-pause');
+    const progressBar = document.getElementById('progress-bar');
+    const timeCurrent = document.getElementById('time-current');
+    const timeDuration = document.getElementById('time-duration');
 
-    if (btnRewind) {
-        btnRewind.addEventListener('click', () => {
+    if (btnRewind10) {
+        btnRewind10.addEventListener('click', () => {
             if (globalAudio.currentTime) {
                 globalAudio.currentTime = Math.max(0, globalAudio.currentTime - 10);
             }
         });
     }
+    
+    if (btnRewind30) {
+        btnRewind30.addEventListener('click', () => {
+            if (globalAudio.currentTime) {
+                globalAudio.currentTime = Math.max(0, globalAudio.currentTime - 30);
+            }
+        });
+    }
 
-    if (btnForward) {
-        btnForward.addEventListener('click', () => {
+    if (btnForward10) {
+        btnForward10.addEventListener('click', () => {
             if (globalAudio.currentTime || globalAudio.currentTime === 0) {
                 globalAudio.currentTime = Math.min(globalAudio.duration || 0, globalAudio.currentTime + 10);
             }
         });
     }
+    
+    if (btnForward30) {
+        btnForward30.addEventListener('click', () => {
+            if (globalAudio.currentTime || globalAudio.currentTime === 0) {
+                globalAudio.currentTime = Math.min(globalAudio.duration || 0, globalAudio.currentTime + 30);
+            }
+        });
+    }
+
+    if (btnPlayPause) {
+        btnPlayPause.addEventListener('click', () => {
+            if (!currentTrackId) return;
+            if (globalAudio.paused) {
+                globalAudio.play();
+            } else {
+                globalAudio.pause();
+            }
+        });
+    }
+
+    globalAudio.addEventListener('play', () => {
+        if(iconPlay && iconPause) {
+            iconPlay.classList.add('hidden');
+            iconPause.classList.remove('hidden');
+        }
+    });
+
+    globalAudio.addEventListener('pause', () => {
+        if(iconPlay && iconPause) {
+            iconPlay.classList.remove('hidden');
+            iconPause.classList.add('hidden');
+        }
+    });
+
+    globalAudio.addEventListener('loadedmetadata', () => {
+        if(progressBar) progressBar.max = globalAudio.duration;
+        if(timeDuration) timeDuration.textContent = formatTime(globalAudio.duration);
+    });
+
+    if(progressBar) {
+        progressBar.addEventListener('input', () => {
+            if(timeCurrent) timeCurrent.textContent = formatTime(progressBar.value);
+        });
+        
+        progressBar.addEventListener('change', () => {
+            globalAudio.currentTime = progressBar.value;
+        });
+    }
 
     globalAudio.addEventListener('timeupdate', () => {
         if (!currentTrackId) return;
-        const storageKey = `history_${currentTrackId}`;
         
+        // Cập nhật progress bar (Chỉ cập nhật khi không bị user đang bấm giữ/drag)
+        if(progressBar && !progressBar.matches(':active')) {
+            progressBar.value = globalAudio.currentTime;
+        }
+        
+        if(timeCurrent) timeCurrent.textContent = formatTime(globalAudio.currentTime);
+
+        const storageKey = `history_${currentTrackId}`;
         if(globalAudio.currentTime > 0 && globalAudio.currentTime < globalAudio.duration) {
             localStorage.setItem(storageKey, globalAudio.currentTime);
         }
@@ -143,6 +222,13 @@ function setupGlobalPlayer() {
         const storageKey = `history_${currentTrackId}`;
         localStorage.removeItem(storageKey);
         globalAudio.currentTime = 0;
+        
+        if(iconPlay && iconPause) {
+            iconPlay.classList.remove('hidden');
+            iconPause.classList.add('hidden');
+        }
+        if(progressBar) progressBar.value = 0;
+        if(timeCurrent) timeCurrent.textContent = "00:00";
     });
 }
 
