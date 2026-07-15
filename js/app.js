@@ -43,7 +43,8 @@ function renderAudioList() {
         actionsContainer.className = 'flex items-center gap-2 flex-shrink-0 ml-2';
 
         const saveBtn = document.createElement('button');
-        saveBtn.className = 'p-1.5 text-blue-600 bg-blue-100 hover:bg-blue-200 dark:text-blue-400 dark:bg-blue-900/30 dark:hover:bg-blue-900/50 rounded transition-colors flex-shrink-0';
+        saveBtn.id = `save-btn-${item.id}`;
+        saveBtn.className = `p-1.5 text-blue-600 bg-blue-100 hover:bg-blue-200 dark:text-blue-400 dark:bg-blue-900/30 dark:hover:bg-blue-900/50 rounded transition-colors flex-shrink-0 ${currentTrackId === item.id ? '' : 'hidden'}`;
         saveBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
         </svg>`;
@@ -117,11 +118,14 @@ function renderAudioList() {
 function updateListUI() {
     audioData.forEach(item => {
         const card = document.getElementById(`card-${item.id}`);
+        const saveBtn = document.getElementById(`save-btn-${item.id}`);
         if(card) {
             if(item.id === currentTrackId) {
                 card.classList.add('active');
+                if (saveBtn) saveBtn.classList.remove('hidden');
             } else {
                 card.classList.remove('active');
+                if (saveBtn) saveBtn.classList.add('hidden');
             }
         }
     });
