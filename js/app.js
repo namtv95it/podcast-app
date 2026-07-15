@@ -39,6 +39,71 @@ function renderAudioList() {
         titleContainer.appendChild(title);
         card.appendChild(titleContainer);
 
+        const actionsContainer = document.createElement('div');
+        actionsContainer.className = 'flex items-center gap-2 flex-shrink-0 ml-2';
+
+        const saveBtn = document.createElement('button');
+        saveBtn.className = 'p-1.5 text-blue-600 bg-blue-100 hover:bg-blue-200 dark:text-blue-400 dark:bg-blue-900/30 dark:hover:bg-blue-900/50 rounded transition-colors flex-shrink-0';
+        saveBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+        </svg>`;
+        saveBtn.title = 'Lưu thời gian hiện tại';
+
+        const restoreBtn = document.createElement('button');
+        restoreBtn.className = 'flex items-center gap-1 px-2 py-1.5 text-xs font-medium text-orange-600 bg-orange-100 hover:bg-orange-200 dark:text-orange-400 dark:bg-orange-900/30 dark:hover:bg-orange-900/50 rounded transition-colors flex-shrink-0';
+        
+        const checkSavedTime = () => {
+            const savedTime = localStorage.getItem(`saved_bookmark_${item.id}`);
+            if (savedTime !== null && !isNaN(savedTime)) {
+                restoreBtn.style.display = 'inline-flex';
+                restoreBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
+                </svg><span>${formatTime(parseFloat(savedTime))}</span>`;
+                restoreBtn.title = 'Hoàn tác thời gian đã lưu';
+            } else {
+                restoreBtn.style.display = 'none';
+            }
+        };
+        checkSavedTime();
+
+        saveBtn.addEventListener('click', (e) => {
+            e.stopPropagation(); // Ngăn sự kiện click phát bài
+            let timeToSave = 0;
+            if (currentTrackId === item.id) {
+                timeToSave = globalAudio.currentTime;
+            } else {
+                const historyTime = localStorage.getItem(`history_${item.id}`);
+                if (historyTime !== null && !isNaN(historyTime)) {
+                    timeToSave = parseFloat(historyTime);
+                } else {
+                    alert('Vui lòng phát bài này một lúc để có thể lưu thời gian!');
+                    return;
+                }
+            }
+            localStorage.setItem(`saved_bookmark_${item.id}`, timeToSave);
+            checkSavedTime();
+            // alert(`Đã lưu thời gian: ${formatTime(timeToSave)} cho bài "${item.title}"`);
+        });
+
+        restoreBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const savedTime = localStorage.getItem(`saved_bookmark_${item.id}`);
+            if (savedTime !== null && !isNaN(savedTime)) {
+                if (currentTrackId === item.id) {
+                    globalAudio.currentTime = parseFloat(savedTime);
+                    if (globalAudio.paused) globalAudio.play();
+                } else {
+                    // Cập nhật history để playTrack nhảy đến đúng thời gian này
+                    localStorage.setItem(`history_${item.id}`, savedTime);
+                    playTrack(item.id);
+                }
+            }
+        });
+
+        actionsContainer.appendChild(saveBtn);
+        actionsContainer.appendChild(restoreBtn);
+        card.appendChild(actionsContainer);
+
         // Sự kiện click để chọn bài
         card.addEventListener('click', () => {
             playTrack(item.id);
