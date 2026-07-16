@@ -11,6 +11,7 @@ const VOLUME_KEY = 'podcast_volume';
 const MUTED_KEY = 'podcast_muted';
 const THEME_KEY = 'podcast_theme';
 const SPEED_KEY = 'podcast_playback_speed';
+const AUTOPLAY_KEY = 'podcast_autoplay';
 
 // Hàm render danh sách
 function renderAudioList() {
@@ -226,6 +227,33 @@ function setupGlobalPlayer() {
     const iconVolMute = document.getElementById('icon-vol-mute');
     const volumeBar = document.getElementById('volume-bar');
     const playbackSpeed = document.getElementById('playback-speed');
+    const btnAutoPlay = document.getElementById('btn-autoplay');
+    const autoPlayText = document.getElementById('autoplay-text');
+
+    // Xử lý Auto Play
+    if (btnAutoPlay) {
+        let isAutoPlay = localStorage.getItem(AUTOPLAY_KEY) !== 'false';
+        
+        const updateAutoPlayUI = () => {
+            if (isAutoPlay) {
+                autoPlayText.textContent = "Bật";
+                btnAutoPlay.classList.remove('bg-gray-100', 'dark:bg-gray-800', 'text-gray-700', 'dark:text-gray-300', 'border-gray-200', 'dark:border-gray-700');
+                btnAutoPlay.classList.add('bg-blue-100', 'dark:bg-blue-900/30', 'text-blue-600', 'dark:text-blue-400', 'border-blue-200', 'dark:border-blue-800');
+            } else {
+                autoPlayText.textContent = "Tắt";
+                btnAutoPlay.classList.remove('bg-blue-100', 'dark:bg-blue-900/30', 'text-blue-600', 'dark:text-blue-400', 'border-blue-200', 'dark:border-blue-800');
+                btnAutoPlay.classList.add('bg-gray-100', 'dark:bg-gray-800', 'text-gray-700', 'dark:text-gray-300', 'border-gray-200', 'dark:border-gray-700');
+            }
+        };
+
+        updateAutoPlayUI();
+
+        btnAutoPlay.addEventListener('click', () => {
+            isAutoPlay = !isAutoPlay;
+            localStorage.setItem(AUTOPLAY_KEY, isAutoPlay.toString());
+            updateAutoPlayUI();
+        });
+    }
 
     // Xử lý Tốc độ phát
     if (playbackSpeed) {
@@ -452,11 +480,14 @@ function setupGlobalPlayer() {
         if(progressBar) progressBar.value = 0;
         if(timeCurrent) timeCurrent.textContent = "00:00";
 
-        // Tự động chuyển sang bài tiếp theo
-        const currentIndex = audioData.findIndex(t => t.id === currentTrackId);
-        if (currentIndex !== -1 && currentIndex < audioData.length - 1) {
-            const nextTrack = audioData[currentIndex + 1];
-            playTrack(nextTrack.id);
+        // Tự động chuyển sang bài tiếp theo nếu AutoPlay được bật
+        const isAutoPlay = localStorage.getItem(AUTOPLAY_KEY) !== 'false';
+        if (isAutoPlay) {
+            const currentIndex = audioData.findIndex(t => t.id === currentTrackId);
+            if (currentIndex !== -1 && currentIndex < audioData.length - 1) {
+                const nextTrack = audioData[currentIndex + 1];
+                playTrack(nextTrack.id);
+            }
         }
     });
 
