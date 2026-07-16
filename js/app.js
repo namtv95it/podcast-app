@@ -32,12 +32,26 @@ function renderAudioList() {
             <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd" />
         </svg>`;
 
+        const titleGroup = document.createElement('div');
+        titleGroup.className = 'flex flex-col';
+
         const title = document.createElement('h2');
         title.className = 'text-base font-semibold text-gray-700 dark:text-gray-200 transition-colors';
         title.textContent = item.title;
 
+        const historyTime = localStorage.getItem(`history_${item.id}`);
+        const historyLabel = document.createElement('span');
+        historyLabel.id = `history-label-${item.id}`;
+        historyLabel.className = 'text-xs text-orange-500 dark:text-orange-400 flex items-center gap-1 mt-0.5';
+        if (historyTime !== null && !isNaN(historyTime) && parseFloat(historyTime) > 0) {
+            historyLabel.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>Đã xem đến ${formatTime(parseFloat(historyTime))}`;
+        }
+
+        titleGroup.appendChild(title);
+        titleGroup.appendChild(historyLabel);
+
         titleContainer.appendChild(icon);
-        titleContainer.appendChild(title);
+        titleContainer.appendChild(titleGroup);
         card.appendChild(titleContainer);
 
         const actionsContainer = document.createElement('div');
@@ -463,6 +477,11 @@ function setupGlobalPlayer() {
             if (now - lastSaveTime >= 5000) {
                 localStorage.setItem(storageKey, globalAudio.currentTime);
                 lastSaveTime = now;
+                // Cập nhật label thời gian đã xem trên card
+                const historyLabel = document.getElementById(`history-label-${currentTrackId}`);
+                if (historyLabel) {
+                    historyLabel.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>Đã xem đến ${formatTime(globalAudio.currentTime)}`;
+                }
             }
         }
     });
@@ -471,6 +490,9 @@ function setupGlobalPlayer() {
         if (!currentTrackId) return;
         const storageKey = `history_${currentTrackId}`;
         localStorage.removeItem(storageKey);
+        // Xóa label thời gian đã xem khi tập kết thúc
+        const historyLabel = document.getElementById(`history-label-${currentTrackId}`);
+        if (historyLabel) historyLabel.innerHTML = '';
         globalAudio.currentTime = 0;
         
         if(iconPlay && iconPause) {
