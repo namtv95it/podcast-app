@@ -21,16 +21,22 @@ function renderAudioList() {
         const card = document.createElement('div');
         // Gắn id cho card để dễ update style (active)
         card.id = `card-${item.id}`;
-        card.className = 'audio-card bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-xl p-4 flex items-center justify-between group transition-colors';
+        card.className = 'audio-card bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-xl p-4 flex items-center justify-between transition-colors';
         
         const titleContainer = document.createElement('div');
         titleContainer.className = 'flex items-center gap-3';
         
         const icon = document.createElement('div');
-        icon.className = 'w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-500 dark:text-blue-400 flex items-center justify-center flex-shrink-0 group-hover:bg-blue-500 dark:group-hover:bg-blue-500 group-hover:text-white transition-colors';
-        icon.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd" />
-        </svg>`;
+        icon.id = `icon-${item.id}`;
+        icon.className = 'w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-500 dark:text-blue-400 flex items-center justify-center flex-shrink-0 hover:bg-blue-500 dark:hover:bg-blue-500 hover:text-white transition-colors cursor-pointer flex-shrink-0';
+        icon.title = 'Phát / Tạm dừng';
+        icon.innerHTML = `
+            <svg class="icon-play-svg h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd" />
+            </svg>
+            <svg class="icon-pause-svg h-5 w-5 hidden" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zM7 8a1 1 0 012 0v4a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v4a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
+            </svg>`;
 
         const titleGroup = document.createElement('div');
         titleGroup.className = 'flex flex-col';
@@ -120,13 +126,33 @@ function renderAudioList() {
         actionsContainer.appendChild(restoreBtn);
         card.appendChild(actionsContainer);
 
-        // Sự kiện click để chọn bài
-        card.addEventListener('click', () => {
+        // Sự kiện click trên icon play để phát/tạm dừng bài
+        icon.addEventListener('click', (e) => {
+            e.stopPropagation();
             playTrack(item.id);
         });
 
         container.appendChild(card);
     });
+}
+
+// Cập nhật icon play/pause trên một card cụ thể
+function updateCardIcon(trackId, isPlaying) {
+    const icon = document.getElementById(`icon-${trackId}`);
+    if (!icon) return;
+    const playsvg = icon.querySelector('.icon-play-svg');
+    const pauseSvg = icon.querySelector('.icon-pause-svg');
+    if (isPlaying) {
+        if (playsvg) playsvg.classList.add('hidden');
+        if (pauseSvg) pauseSvg.classList.remove('hidden');
+        icon.classList.add('bg-blue-500', 'text-white');
+        icon.classList.remove('bg-blue-100', 'dark:bg-blue-900/30', 'text-blue-500', 'dark:text-blue-400');
+    } else {
+        if (playsvg) playsvg.classList.remove('hidden');
+        if (pauseSvg) pauseSvg.classList.add('hidden');
+        icon.classList.remove('bg-blue-500', 'text-white');
+        icon.classList.add('bg-blue-100', 'dark:bg-blue-900/30', 'text-blue-500', 'dark:text-blue-400');
+    }
 }
 
 // Cập nhật UI danh sách (đánh dấu bài đang phát)
@@ -141,6 +167,8 @@ function updateListUI() {
             } else {
                 card.classList.remove('active');
                 if (saveBtn) saveBtn.classList.add('hidden');
+                // Reset icon về trạng thái play cho các bài không active
+                updateCardIcon(item.id, false);
             }
         }
     });
@@ -435,6 +463,8 @@ function setupGlobalPlayer() {
             iconPlay.classList.add('hidden');
             iconPause.classList.remove('hidden');
         }
+        // Cập nhật icon trên card đang phát
+        if (currentTrackId) updateCardIcon(currentTrackId, true);
     });
 
     globalAudio.addEventListener('pause', () => {
@@ -442,6 +472,8 @@ function setupGlobalPlayer() {
             iconPlay.classList.remove('hidden');
             iconPause.classList.add('hidden');
         }
+        // Cập nhật icon trên card về trạng thái pause
+        if (currentTrackId) updateCardIcon(currentTrackId, false);
     });
 
     globalAudio.addEventListener('loadedmetadata', () => {
